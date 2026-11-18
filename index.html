@@ -1,0 +1,654 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retrieving Data Siswa</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #202938;
+}
+
+header {
+    background: white;
+    border-bottom: 1px solid #e5e9ef;
+    padding: 20px 28px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+header p {
+    margin: 6px 0 0;
+    color: #697586;
+    font-size: 14px;
+}
+
+main {
+    max-width: 1150px;
+    margin: 25px auto;
+    padding: 0 20px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.card, .panel {
+    background: white;
+    border: 1px solid #e4e9f0;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.card small { color: #6b7788; }
+
+.card strong {
+    display: block;
+    font-size: 25px;
+    margin-top: 10px;
+}
+
+.panel { margin-bottom: 18px; }
+
+.panel h2 {
+    font-size: 17px;
+    margin: 0 0 16px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.field label {
+    display: block;
+    font-size: 12px;
+    color: #586579;
+    margin-bottom: 6px;
+}
+
+.field input, .field select,
+.toolbar input, .toolbar select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d9e0e8;
+    border-radius: 7px;
+    background: white;
+    font: inherit;
+}
+
+.actions, .toolbar {
+    display: flex;
+    gap: 9px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+button {
+    border: 0;
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary { background: #3867e8; color: white; }
+.secondary { background: #eef2f7; color: #344256; }
+.danger { background: #fff0f0; color: #bd3d3d; }
+
+.toolbar { margin: 0 0 14px; }
+.toolbar input { max-width: 300px; }
+.toolbar select { max-width: 180px; }
+
+.table-wrap { overflow-x: auto; }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 680px;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 1px solid #edf0f4;
+    font-size: 13px;
+}
+
+th {
+    font-size: 11px;
+    color: #6c7889;
+    text-transform: uppercase;
+    background: #fafbfd;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    background: #edf2ff;
+    color: #4266c7;
+}
+
+.tag.ips {
+    background: #e9f7f1;
+    color: #23845e;
+}
+
+.tag.bahasa {
+    background: #fff4e5;
+    color: #a86e18;
+}
+
+.row-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.row-actions button {
+    padding: 6px 9px;
+    font-size: 11px;
+}
+
+.empty {
+    text-align: center;
+    color: #778396;
+    padding: 26px;
+}
+
+footer {
+    font-size: 12px;
+    color: #788598;
+    padding-top: 12px;
+}
+
+@media(max-width:850px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media(max-width:560px) {
+    header { padding: 17px; }
+    main { padding: 0 12px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .toolbar input, .toolbar select {
+        max-width: none;
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Retrieving Data Siswa</h1>
+    <p>Data pemilihan jurusan dan nilai raport</p>
+</header>
+
+<main>
+
+<!-- STATISTIK -->
+<section class="cards">
+
+    <div class="card">
+        <small>Total Siswa</small>
+        <strong id="totalCount">0</strong>
+    </div>
+
+    <div class="card">
+        <small>Jurusan IPA</small>
+        <strong id="ipaCount">0</strong>
+    </div>
+
+    <div class="card">
+        <small>Jurusan IPS</small>
+        <strong id="ipsCount">0</strong>
+    </div>
+
+    <div class="card">
+        <small>Jurusan Bahasa</small>
+        <strong id="bahasaCount">0</strong>
+    </div>
+
+</section>
+
+<!-- FORM INPUT -->
+<section class="panel">
+
+    <h2 id="formTitle">Input Data Siswa</h2>
+
+    <form id="studentForm">
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label for="nis">NIS</label>
+                <input id="nis" required placeholder="Masukkan NIS">
+            </div>
+
+            <div class="field">
+                <label for="siswa">Siswa</label>
+                <input id="siswa" required placeholder="Masukkan nama siswa">
+            </div>
+
+            <div class="field">
+                <label for="jurusan">Jurusan</label>
+                <select id="jurusan" required>
+                    <option value="">Pilih jurusan</option>
+                    <option>IPA</option>
+                    <option>IPS</option>
+                    <option>Bahasa</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="nilai">Nilai Raport</label>
+                <input id="nilai" type="number"
+                       min="0" max="100"
+                       required placeholder="0–100">
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <button class="primary" id="saveBtn" type="submit">
+                Simpan Data
+            </button>
+
+            <button class="secondary" id="cancelEdit"
+                    type="button" hidden>
+                Batal Edit
+            </button>
+
+            <button class="secondary" id="resetBtn" type="button">
+                Kosongkan Form
+            </button>
+        </div>
+
+    </form>
+</section>
+
+<!-- TABEL DATA -->
+<section class="panel">
+
+    <h2>Data Siswa</h2>
+
+    <div class="toolbar">
+        <input type="search" id="search"
+               placeholder="Cari siswa atau NIS...">
+
+        <select id="filter">
+            <option value="">Semua Jurusan</option>
+            <option>IPA</option>
+            <option>IPS</option>
+            <option>Bahasa</option>
+        </select>
+
+        <button class="secondary" id="exportBtn" type="button">
+            Export CSV
+        </button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>NIS</th>
+                    <th>Siswa</th>
+                    <th>Jurusan</th>
+                    <th>Nilai Raport</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody id="tbody"></tbody>
+
+        </table>
+    </div>
+
+    <footer id="status">
+        Data tersimpan otomatis di browser (localStorage).
+    </footer>
+
+</section>
+</main>
+
+<script>
+
+// DATA AWAL
+const initialData = [
+
+    // IPA
+    ["29540001","Audia Azzahra","IPA",95],
+    ["29540002","Arafat Zayyan","IPA",92],
+    ["29540003","Briyan Syaputra","IPA",94],
+    ["29540004","Clarin Ayu","IPA",97],
+    ["29540005","David Eka","IPA",93],
+    ["29540006","Ghea Permata","IPA",95],
+    ["29540007","Haliva Nadia Cahyani","IPA",92],
+    ["29540008","Revan Kurnia","IPA",90],
+    ["29540009","Safa Ninda","IPA",96],
+    ["29540010","Vina Aulia","IPA",94],
+
+    // IPS
+    ["29530010","Asha Marsela","IPS",85],
+    ["29530020","Andi Mahendra","IPS",82],
+    ["29530030","Berliana Putri","IPS",89],
+    ["29530040","Bevan Samudra","IPS",84],
+    ["29530050","Cantika Rasti","IPS",88],
+    ["29530060","Deva Abigail","IPS",81],
+    ["29530070","Pandu Egar","IPS",87],
+    ["29530080","Revan Zakki Tama","IPS",80],
+    ["29530090","Sino Adi Mahendra","IPS",86],
+    ["29530100","Zafran Maulana","IPS",89],
+
+    // BAHASA
+    ["29520100","Azka Amy","Bahasa",74],
+    ["29520200","Bila Annika Azzahra","Bahasa",78],
+    ["29520300","Clara Maulidya","Bahasa",73],
+    ["29520400","Dani Mahendra Irwansyah","Bahasa",80],
+    ["29520500","Dummy Aditya","Bahasa",70],
+    ["29520600","Regar Fajri","Bahasa",75],
+    ["29520700","Senna Via Eka","Bahasa",79],
+    ["29520800","Silva Fauzia","Bahasa",72],
+    ["29520900","Wanda Ghea Nuraini","Bahasa",77],
+    ["29521000","Zada Atha","Bahasa",76]
+
+];
+
+// LOCAL STORAGE
+const KEY = "retrievingDataSiswa_v1";
+
+let students = loadData();
+let editNis = null;
+
+function loadData() {
+    try {
+        let saved = localStorage.getItem(KEY);
+
+        return saved
+            ? JSON.parse(saved)
+            : initialData.map(row => [...row]);
+
+    } catch (error) {
+        return initialData.map(row => [...row]);
+    }
+}
+
+function saveData() {
+    localStorage.setItem(KEY, JSON.stringify(students));
+}
+
+// WARNA LABEL JURUSAN
+function tagClass(jurusan) {
+    if (jurusan === "IPS") return "ips";
+    if (jurusan === "Bahasa") return "bahasa";
+    return "";
+}
+
+// STATISTIK
+function updateStats() {
+
+    document.getElementById("totalCount").textContent =
+        students.length;
+
+    document.getElementById("ipaCount").textContent =
+        students.filter(s => s[2] === "IPA").length;
+
+    document.getElementById("ipsCount").textContent =
+        students.filter(s => s[2] === "IPS").length;
+
+    document.getElementById("bahasaCount").textContent =
+        students.filter(s => s[2] === "Bahasa").length;
+}
+
+// AMAN UNTUK MENAMPILKAN TEXT
+function esc(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[char]));
+}
+
+// RETRIEVING / MENAMPILKAN DATA
+function render() {
+
+    let keyword = document.getElementById("search")
+        .value.trim().toLowerCase();
+
+    let jurusan = document.getElementById("filter").value;
+
+    let filtered = students.filter(s =>
+        (!jurusan || s[2] === jurusan) &&
+        (!keyword ||
+            s[0].toLowerCase().includes(keyword) ||
+            s[1].toLowerCase().includes(keyword)
+        )
+    );
+
+    let tbody = document.getElementById("tbody");
+
+    if (filtered.length > 0) {
+
+        tbody.innerHTML = filtered.map((s, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${esc(s[0])}</td>
+                <td><b>${esc(s[1])}</b></td>
+                <td>
+                    <span class="tag ${tagClass(s[2])}">
+                        ${esc(s[2])}
+                    </span>
+                </td>
+                <td>${s[3]}</td>
+                <td>
+                    <div class="row-actions">
+                        <button class="secondary"
+                            onclick="editStudent('${encodeURIComponent(s[0])}')">
+                            Edit
+                        </button>
+
+                        <button class="danger"
+                            onclick="deleteStudent('${encodeURIComponent(s[0])}')">
+                            Hapus
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+
+    } else {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty">
+                    Data tidak ditemukan
+                </td>
+            </tr>
+        `;
+
+    }
+
+    updateStats();
+
+    document.getElementById("status").textContent =
+        `Menampilkan ${filtered.length} dari ${students.length} data. ` +
+        `Data tersimpan pada browser ini (localStorage).`;
+}
+
+// KOSONGKAN FORM
+function clearForm() {
+
+    document.getElementById("studentForm").reset();
+
+    editNis = null;
+
+    document.getElementById("formTitle").textContent =
+        "Input Data Siswa";
+
+    document.getElementById("saveBtn").textContent =
+        "Simpan Data";
+
+    document.getElementById("cancelEdit").hidden = true;
+}
+
+// SIMPAN DATA BARU ATAU EDIT
+document.getElementById("studentForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    let nis = document.getElementById("nis").value.trim();
+    let nama = document.getElementById("siswa").value.trim();
+    let jurusan = document.getElementById("jurusan").value;
+    let nilai = Number(document.getElementById("nilai").value);
+
+    if (nilai < 0 || nilai > 100) {
+        alert("Nilai raport harus antara 0–100");
+        return;
+    }
+
+    // CEK NIS DUPLIKAT
+    if (editNis === null &&
+        students.some(s => s[0] === nis)) {
+
+        alert("NIS sudah digunakan. Masukkan NIS yang berbeda.");
+        return;
+    }
+
+    // MODE EDIT
+    if (editNis !== null) {
+
+        let index = students.findIndex(s => s[0] === editNis);
+
+        if (index >= 0) {
+            students[index] = [nis, nama, jurusan, nilai];
+        }
+
+    } else {
+
+        // MODE TAMBAH
+        students.push([nis, nama, jurusan, nilai]);
+
+    }
+
+    saveData();
+    clearForm();
+    render();
+
+});
+
+// EDIT DATA
+function editStudent(encodedNis) {
+
+    let nis = decodeURIComponent(encodedNis);
+
+    let siswa = students.find(row => row[0] === nis);
+
+    if (!siswa) return;
+
+    editNis = nis;
+
+    document.getElementById("nis").value = siswa[0];
+    document.getElementById("siswa").value = siswa[1];
+    document.getElementById("jurusan").value = siswa[2];
+    document.getElementById("nilai").value = siswa[3];
+
+    document.getElementById("formTitle").textContent =
+        "Edit Data Siswa";
+
+    document.getElementById("saveBtn").textContent =
+        "Simpan Perubahan";
+
+    document.getElementById("cancelEdit").hidden = false;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// HAPUS DATA
+function deleteStudent(encodedNis) {
+
+    let nis = decodeURIComponent(encodedNis);
+
+    let siswa = students.find(row => row[0] === nis);
+
+    if (siswa && confirm(`Hapus data ${siswa[1]}?`)) {
+
+        students = students.filter(row => row[0] !== nis);
+
+        saveData();
+        render();
+
+        if (editNis === nis) {
+            clearForm();
+        }
+    }
+}
+
+// TOMBOL
+document.getElementById("cancelEdit").onclick = clearForm;
+document.getElementById("resetBtn").onclick = clearForm;
+
+// SEARCH
+document.getElementById("search")
+.addEventListener("input", render);
+
+// FILTER
+document.getElementById("filter")
+.addEventListener("change", render);
+
+// EXPORT CSV
+document.getElementById("exportBtn").onclick = function() {
+
+    let csv = [
+        ["NIS", "Siswa", "Jurusan", "Nilai Raport"],
+        ...students
+    ].map(row =>
+        row.map(value =>
+            `"${String(value).replace(/"/g, '""')}"`
+        ).join(",")
+    ).join("\n");
+
+    let blob = new Blob(["\uFEFF" + csv], {
+        type: "text/csv;charset=utf-8"
+    });
+
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+
+    a.href = url;
+    a.download = "data_siswa.csv";
+    a.click();
+
+    URL.revokeObjectURL(url);
+};
+
+// TAMPILKAN DATA SAAT WEBSITE DIBUKA
+render();
+
+</script>
+</body>
+</html>
